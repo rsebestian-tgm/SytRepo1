@@ -46,22 +46,26 @@ public class ComputeEngine implements Compute {
     public <T> T executeTask(Task<T> t) {
         return t.execute();
     }
+    public static int bindEngine(String name,int port) {
 
+         try {
+             //String name = "Compute";//String literal
+             Compute engine = new ComputeEngine();
+             Compute stub =
+                 (Compute) UnicastRemoteObject.exportObject(engine, 0);//Request handler, Parameter handler,  Object calling, 
+             Registry registry = LocateRegistry.createRegistry(port);
+             registry.rebind(name, stub);
+             System.out.println("ComputeEngine bound");
+         } catch (Exception e) {
+             System.err.println("ComputeEngine exception:");
+             e.printStackTrace();
+         }
+    	return 0;
+    }
     public static void main(String[] args) {
-        if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new SecurityManager());
-        }
-        try {
-            String name = "Compute";//String literal
-            Compute engine = new ComputeEngine();
-            Compute stub =
-                (Compute) UnicastRemoteObject.exportObject(engine, 0);//Request handler, Parameter handler,  Object calling, 
-            Registry registry = LocateRegistry.createRegistry(1099);
-            registry.rebind(name, stub);
-            System.out.println("ComputeEngine bound");
-        } catch (Exception e) {
-            System.err.println("ComputeEngine exception:");
-            e.printStackTrace();
-        }
+   	 if (System.getSecurityManager() == null) {
+         System.setSecurityManager(new SecurityManager());
+     }
+       bindEngine("Compute",1099);
     }
 }
